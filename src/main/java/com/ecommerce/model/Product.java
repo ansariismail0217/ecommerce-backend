@@ -39,9 +39,7 @@ public class Product {
 
 	public Product() {}
 
-	public Product(Integer id, String name, String description, float rating, double price, Category category) {
-		super();
-		this.id = id;
+	public Product(String name, String description, float rating, double price, Category category) {
 		this.name = name;
 		this.description = description;
 		this.rating = rating;

@@ -29,7 +29,6 @@ public class Category {
 	public Category() {}
 
 	public Category(String name, List<Product> products) {
-		super();
 		this.name = name;
 		this.products = products;
 	}

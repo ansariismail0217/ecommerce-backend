@@ -17,7 +17,7 @@ import com.ecommerce.dto.CategoryDto;
 import com.ecommerce.dto.ProductsByCategoryDto;
 //import com.ecommerce.dto.ProductsByCategoryDto;
 import com.ecommerce.model.Category;
-import com.ecommerce.repository.CategoryRepository;
+import com.ecommerce.service.CategoryService;
 
 @CrossOrigin("http://localhost:4200/")
 @RestController
@@ -25,63 +25,61 @@ import com.ecommerce.repository.CategoryRepository;
 public class CategoryController {
 	
 	@Autowired
-	private CategoryRepository categoryRepository;
+	private CategoryService categoryService;
 	
-//	get all categories lazy fetch
+//	CREATE
+	@PostMapping("/add")
+	public List<CategoryDto> addCategory(@RequestBody Category category){
+		categoryService.addCategory(category);
+		return categoryService.getLazy();
+	}
+	
+//	READ
+//	Lazy Fetch: this will return categories with id and name fields only
 	@GetMapping("/all")
 	public List<CategoryDto> getLazy() {
-		return categoryRepository.findLazyCategories();
+		return categoryService.getLazy();
 	}
 	
-//	get all categories eager fetch
+//	Eager Fetch: this will return categories with all fields 
+//	including all the products inside them
 	@GetMapping("/all/details")
 	public List<Category> getAll(){
-		return categoryRepository.findAll();
+		return categoryService.getAll();
 	}
 	
-//	get category by id eager fetch products
+//	Eager Fetch: Get category by id along with the products stored inside it
 //	request param uses query params as key and value in postman
 //	@GetMapping("/get")
 //	public Category getCategory(@RequestParam("id") int id) {
-//		return categoryRepository.findById(id).get();
+//		return categoryService.getCategory(id);
 //	}
 	
-	
-//	get category by id eager fetch products
+//	Eager Fetch: Get category by id along with the products stored inside it
 //	get same result as above but id passed directly with url instead of query param
 	@GetMapping("/{id}")
 	public Category getById(@PathVariable Integer id) {
-		return categoryRepository.findProductsByCategory(id);
+		return categoryService.getById(id);
 	}
 	
 //	get by name
 	@GetMapping("/get")
 	public Category getCategoryByName(@RequestParam("name") String name) {
-		return categoryRepository.findByName(name);
+		return categoryService.getCategoryByName(name);
 	}
 	
 	@GetMapping("/{id}/details")
-	public ProductsByCategoryDto findProducts(@PathVariable Integer id) {
-		Category category =  this.categoryRepository.findById(id).get();
-		
-		ProductsByCategoryDto productsByCategoryDto = new ProductsByCategoryDto();
-		productsByCategoryDto.setProducts(category.getProducts());
-		
-		return productsByCategoryDto;
+	public ProductsByCategoryDto findProducts(@PathVariable Integer id) {		
+		return categoryService.findProducts(id);
 	}
 	
-//	add a new category
-	@PostMapping("/add")
-	public List<Category> addCategory(@RequestBody final Category category){
-		categoryRepository.save(category);
-		return categoryRepository.findAll();
-	}
+//	UPDATE
 	
-//	Delete if category has no products
+//	DELETE
 	@DeleteMapping("/delete/{id}")
 	public List<Category> deleteCategory(@PathVariable int id){
-		categoryRepository.deleteById(id);
-		return categoryRepository.findAll();
+		categoryService.deleteCategory(id);
+		return categoryService.getAll();
 	}
 
 }

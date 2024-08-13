@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecommerce.dto.CategoryDto;
 import com.ecommerce.dto.ProductDto;
 import com.ecommerce.model.Product;
-import com.ecommerce.repository.ProductRepository;
+import com.ecommerce.service.ProductService;
 
 //http://localhost:8080/products
 
@@ -25,33 +25,40 @@ import com.ecommerce.repository.ProductRepository;
 @RestController
 @RequestMapping("/products")
 public class ProductController {
-
+	
 	@Autowired
-	private ProductRepository productRepository;
-
+	private ProductService productService;
+	
+//	CREATE
+	@PostMapping(value = "/add")
+	public Product addProduct(@RequestBody Product product) {
+		return productService.addProduct(product);
+	}
+	
+//	READ
 //	find all products
 	@GetMapping("/all")
 	public List<Product> getAll() {
-		return productRepository.findAll();
+		return productService.getAll();
 	}
 	
 //	get product by id lazy fetch
 	@GetMapping("/{id}")
 	public Product getById(@PathVariable Integer id) {
-		return productRepository.findById(id).get();
+		return productService.getById(id);
 	}
 	
 //	get by name
 	@GetMapping("/search")
 	public List<Product> getProductByName(@RequestParam("name") String name) {
-		return productRepository.findByNameContaining(name);
+		return productService.getProductByName(name);
 	}
 	
 //	get product details eager fetch using dto
 	@GetMapping("/{id}/details")
 	public ProductDto findProductById(@PathVariable Integer id) {
 
-		Product product = this.productRepository.findById(id).get();
+		Product product = productService.getById(id);
 
 		CategoryDto categoryDto = new CategoryDto();
 		categoryDto.setId(product.getCategory().getId());
@@ -68,35 +75,18 @@ public class ProductController {
 		return productDto;
 
 	}
-
-//  adding a product
-	@PostMapping(value = "/add")
-	public List<Product> addProduct(@RequestBody final Product product) {
-		productRepository.save(product);
-		return productRepository.findAll();
-	}
-
-//	deleting a product
-	@DeleteMapping(value = "/delete/{id}")
-	public List<Product> deleteProduct(@PathVariable int id) {
-		productRepository.deleteById(id);
-		return productRepository.findAll();
-	}
-
-//	updating a product
+	
+//	UPDATE
 	@PutMapping(value = "/update/{id}")
 	public List<Product> updateProduct(@PathVariable int id, @RequestBody Product product) {
-		if (productRepository.existsById(id)) {
-
-			Product product2 = productRepository.findById(id).get();
-			product2.setName(product.getName());
-			product2.setDescription(product.getDescription());
-			product2.setRating(product.getRating());
-			product2.setPrice(product.getPrice());
-
-			productRepository.save(product2);
-		}
-		return productRepository.findAll();
+		return productService.updateProduct(id, product);
+	}
+	
+//	DELETE
+	@DeleteMapping(value = "/delete/{id}")
+	public List<Product> deleteProduct(@PathVariable int id) {
+		productService.deleteProduct(id);
+		return productService.getAll();
 	}
 
 }

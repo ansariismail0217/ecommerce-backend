@@ -8,7 +8,6 @@ public class CategoryDto {
 	public CategoryDto() {}
 
 	public CategoryDto(Integer id, String name) {
-		super();
 		this.id = id;
 		this.name = name;
 	}
