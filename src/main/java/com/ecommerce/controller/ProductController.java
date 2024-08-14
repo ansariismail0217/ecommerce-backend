@@ -3,7 +3,8 @@ package com.ecommerce.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,14 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.dto.CategoryDto;
 import com.ecommerce.dto.ProductDto;
 import com.ecommerce.model.Product;
 import com.ecommerce.service.ProductService;
 
 //http://localhost:8080/products
-
-@CrossOrigin("http://localhost:4200/")
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -31,62 +29,47 @@ public class ProductController {
 	
 //	CREATE
 	@PostMapping(value = "/add")
-	public Product addProduct(@RequestBody Product product) {
-		return productService.addProduct(product);
+	public ResponseEntity<Product> postProduct(@RequestBody Product product) {
+		return new ResponseEntity<>(productService.createProduct(product), HttpStatus.CREATED);
 	}
 	
 //	READ
 //	find all products
 	@GetMapping("/all")
-	public List<Product> getAll() {
-		return productService.getAll();
+	public ResponseEntity<List<Product>> getAll() {
+		return new ResponseEntity<>(productService.getAll(), HttpStatus.OK);
 	}
 	
 //	get product by id lazy fetch
 	@GetMapping("/{id}")
-	public Product getById(@PathVariable Integer id) {
-		return productService.getById(id);
-	}
-	
-//	get by name
-	@GetMapping("/search")
-	public List<Product> getProductByName(@RequestParam("name") String name) {
-		return productService.getProductByName(name);
+	public ResponseEntity<Product> getById(@PathVariable Integer id) {
+		return new ResponseEntity<>(productService.getById(id), HttpStatus.OK);
 	}
 	
 //	get product details eager fetch using dto
+//	this will include category also in product details
 	@GetMapping("/{id}/details")
-	public ProductDto findProductById(@PathVariable Integer id) {
+	public ResponseEntity<ProductDto> findProductById(@PathVariable Integer id) {
+		return new ResponseEntity<>(productService.getByIdEagerFetch(id), HttpStatus.OK);
 
-		Product product = productService.getById(id);
-
-		CategoryDto categoryDto = new CategoryDto();
-		categoryDto.setId(product.getCategory().getId());
-		categoryDto.setName(product.getCategory().getName());
-
-		ProductDto productDto = new ProductDto();
-		productDto.setId(product.getId());
-		productDto.setName(product.getName());
-		productDto.setDescription(product.getDescription());
-		productDto.setRating(product.getRating());
-		productDto.setPrice(product.getPrice());
-		productDto.setCategory(categoryDto);
-
-		return productDto;
-
+	}
+	
+//	get by name lazy fetch
+	@GetMapping("/search")
+	public ResponseEntity<Product> getProductByName(@RequestParam("name") String name) {
+		return new ResponseEntity<>(productService.getByName(name), HttpStatus.OK);
 	}
 	
 //	UPDATE
 	@PutMapping(value = "/update/{id}")
-	public List<Product> updateProduct(@PathVariable int id, @RequestBody Product product) {
-		return productService.updateProduct(id, product);
+	public ResponseEntity<Product> updateProduct(@PathVariable int id, @RequestBody Product product) {
+		return new ResponseEntity<>(productService.updateById(id, product), HttpStatus.OK);
 	}
 	
 //	DELETE
 	@DeleteMapping(value = "/delete/{id}")
-	public List<Product> deleteProduct(@PathVariable int id) {
-		productService.deleteProduct(id);
-		return productService.getAll();
+	public ResponseEntity<?> deleteProduct(@PathVariable int id) {
+		return new ResponseEntity<>(productService.deleteById(id), HttpStatus.NO_CONTENT);
 	}
 
 }

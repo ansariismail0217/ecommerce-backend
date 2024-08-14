@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,28 +32,28 @@ public class CategoryController {
 	@PostMapping("/add")
 	public List<CategoryDto> addCategory(@RequestBody Category category){
 		categoryService.addCategory(category);
-		return categoryService.getLazy();
+		return categoryService.getAllLazyFetch();
 	}
 	
 //	READ
 //	Lazy Fetch: this will return categories with id and name fields only
 	@GetMapping("/all")
 	public List<CategoryDto> getLazy() {
-		return categoryService.getLazy();
+		return categoryService.getAllLazyFetch();
 	}
 	
 //	Eager Fetch: this will return categories with all fields 
 //	including all the products inside them
 	@GetMapping("/all/details")
 	public List<Category> getAll(){
-		return categoryService.getAll();
+		return categoryService.getAllEagerFetch();
 	}
 	
 //	Eager Fetch: Get category by id along with the products stored inside it
 //	request param uses query params as key and value in postman
 //	@GetMapping("/get")
 //	public Category getCategory(@RequestParam("id") int id) {
-//		return categoryService.getCategory(id);
+//		return categoryService.getByIdEagerFetch(id);
 //	}
 	
 //	Eager Fetch: Get category by id along with the products stored inside it
@@ -62,24 +63,29 @@ public class CategoryController {
 		return categoryService.getById(id);
 	}
 	
-//	get by name
-	@GetMapping("/get")
+//	get by name with products stored inside it 
+	@GetMapping("/search")
 	public Category getCategoryByName(@RequestParam("name") String name) {
-		return categoryService.getCategoryByName(name);
+		return categoryService.getByName(name);
 	}
 	
+//	get only the products stored inside the given category
 	@GetMapping("/{id}/details")
 	public ProductsByCategoryDto findProducts(@PathVariable Integer id) {		
 		return categoryService.findProducts(id);
 	}
 	
 //	UPDATE
+	@PutMapping("/{id}/update")
+	public Category updateCategory(@PathVariable int id, @RequestBody Category category) {
+		return categoryService.updateCategoryById(id, category);
+	}
 	
 //	DELETE
 	@DeleteMapping("/delete/{id}")
 	public List<Category> deleteCategory(@PathVariable int id){
 		categoryService.deleteCategory(id);
-		return categoryService.getAll();
+		return categoryService.getAllEagerFetch();
 	}
 
 }

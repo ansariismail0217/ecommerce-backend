@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.dto.CategoryDto;
 import com.ecommerce.dto.ProductsByCategoryDto;
+import com.ecommerce.exceptions.ItemNotFoundException;
 import com.ecommerce.model.Category;
 import com.ecommerce.repository.CategoryRepository;
 
@@ -17,33 +18,38 @@ public class CategoryService {
 	private CategoryRepository categoryRepository;
 
 //	CREATE
-	public Category addCategory(final Category category){
+	public Category addCategory(Category category){
 		return categoryRepository.save(category);
 	}
 
 //	READ
 //	Lazy Fetch: this will return categories with id and name fields only
-	public List<CategoryDto> getLazy() {
+	public List<CategoryDto> getAllLazyFetch() {
 		return categoryRepository.findLazyCategories();
 	}
 
 //	Eager Fetch: this will return categories with all fields 
 //	including all the products inside them
-	public List<Category> getAll() {
+	public List<Category> getAllEagerFetch() {
 		return categoryRepository.findAll();
 	}
 
-	public Category getCategory(int id) {
-		return categoryRepository.findById(id).get();
+	public Category getByIdEagerFetch(int id) {
+		return categoryRepository.findById(id)
+				.orElseThrow(()-> new ItemNotFoundException("No item found with the given description"));
 	}
 	
 //	Eager Fetch: Get category by id along with the products stored inside it
 	public Category getById(Integer id) {
-		return categoryRepository.findProductsByCategory(id);
+		return categoryRepository.findProductsByCategory(id)
+				.orElseThrow(()-> new ItemNotFoundException("No item found with the given description"));
 	}
 	
-	public Category getCategoryByName(String name) {
-		return categoryRepository.findByName(name);
+	public Category getByName(String name) {
+		if(categoryRepository.existsByName(name)) {
+			return categoryRepository.findByName(name);
+		}
+		throw new ItemNotFoundException("No item found with the given description");
 	}
 	
 //	Get only products stored inside a category
@@ -57,6 +63,11 @@ public class CategoryService {
 	}
 
 //	UPDATE
+	public Category updateCategoryById(int id, Category category) {
+		Category category2 = categoryRepository.findById(id).get();
+		category2.setName(category.getName());
+		return categoryRepository.save(category2);
+	}
 
 //	DELETE
 	public List<Category> deleteCategory(int id){
