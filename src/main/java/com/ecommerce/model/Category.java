@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
@@ -15,14 +16,14 @@ import jakarta.persistence.OneToMany;
 public class Category {
 	
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id", unique = true, nullable = false)
 	private Integer id;
 	
 	@Column(name = "name", nullable = false)
 	private String name;
 	
-	@JsonManagedReference
+	@JsonManagedReference("category-product")
 	@OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
 	private List<Product> products = new ArrayList<>();
 

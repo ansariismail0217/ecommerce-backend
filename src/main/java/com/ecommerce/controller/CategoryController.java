@@ -3,6 +3,8 @@ package com.ecommerce.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,62 +32,54 @@ public class CategoryController {
 	
 //	CREATE
 	@PostMapping("/add")
-	public List<CategoryDto> addCategory(@RequestBody Category category){
-		categoryService.addCategory(category);
-		return categoryService.getAllLazyFetch();
+	public ResponseEntity<List<CategoryDto>> addCategory(@RequestBody Category category){
+		categoryService.createCategory(category);
+		return new ResponseEntity<>(categoryService.getAllLazyFetch(), HttpStatus.CREATED);
 	}
 	
 //	READ
 //	Lazy Fetch: this will return categories with id and name fields only
-	@GetMapping("/all")
-	public List<CategoryDto> getLazy() {
-		return categoryService.getAllLazyFetch();
+	@GetMapping
+	public ResponseEntity<List<CategoryDto>> getLazy() {
+		return new ResponseEntity<>(categoryService.getAllLazyFetch(), HttpStatus.OK);
 	}
 	
 //	Eager Fetch: this will return categories with all fields 
 //	including all the products inside them
-	@GetMapping("/all/details")
-	public List<Category> getAll(){
-		return categoryService.getAllEagerFetch();
+	@GetMapping("/")
+	public ResponseEntity<List<Category>> getAll(){
+		return new ResponseEntity<>(categoryService.getAllEagerFetch(), HttpStatus.OK);
 	}
 	
 //	Eager Fetch: Get category by id along with the products stored inside it
-//	request param uses query params as key and value in postman
-//	@GetMapping("/get")
-//	public Category getCategory(@RequestParam("id") int id) {
-//		return categoryService.getByIdEagerFetch(id);
-//	}
-	
-//	Eager Fetch: Get category by id along with the products stored inside it
-//	get same result as above but id passed directly with url instead of query param
 	@GetMapping("/{id}")
-	public Category getById(@PathVariable Integer id) {
-		return categoryService.getById(id);
+	public ResponseEntity<Category> getById(@PathVariable Integer id) {
+		return new ResponseEntity<>(categoryService.getByIdEagerFetch(id), HttpStatus.OK);
 	}
 	
 //	get by name with products stored inside it 
 	@GetMapping("/search")
-	public Category getCategoryByName(@RequestParam("name") String name) {
-		return categoryService.getByName(name);
+	public ResponseEntity<Category> getCategoryByName(@RequestParam("name") String name) {
+		return new ResponseEntity<>(categoryService.getByName(name), HttpStatus.OK);
 	}
 	
 //	get only the products stored inside the given category
 	@GetMapping("/{id}/details")
-	public ProductsByCategoryDto findProducts(@PathVariable Integer id) {		
-		return categoryService.findProducts(id);
+	public ResponseEntity<ProductsByCategoryDto> findProducts(@PathVariable Integer id) {		
+		return new ResponseEntity<>(categoryService.findProducts(id), HttpStatus.OK);
 	}
 	
 //	UPDATE
 	@PutMapping("/{id}/update")
-	public Category updateCategory(@PathVariable int id, @RequestBody Category category) {
-		return categoryService.updateCategoryById(id, category);
+	public ResponseEntity<Category> updateCategory(@PathVariable int id, @RequestBody Category category) {
+		return new ResponseEntity<>(categoryService.updateById(id, category), HttpStatus.OK);
 	}
 	
 //	DELETE
 	@DeleteMapping("/delete/{id}")
-	public List<Category> deleteCategory(@PathVariable int id){
-		categoryService.deleteCategory(id);
-		return categoryService.getAllEagerFetch();
+	public ResponseEntity<List<Category>> deleteCategory(@PathVariable int id){
+		categoryService.deleteById(id);
+		return new ResponseEntity<>(categoryService.getAllEagerFetch(), HttpStatus.OK);
 	}
 
 }

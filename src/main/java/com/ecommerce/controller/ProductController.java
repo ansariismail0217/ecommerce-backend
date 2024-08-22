@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,14 +29,14 @@ public class ProductController {
 	private ProductService productService;
 	
 //	CREATE
-	@PostMapping(value = "/add")
+	@PostMapping(value = "/add", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Product> postProduct(@RequestBody Product product) {
 		return new ResponseEntity<>(productService.createProduct(product), HttpStatus.CREATED);
 	}
 	
 //	READ
 //	find all products
-	@GetMapping("/all")
+	@GetMapping
 	public ResponseEntity<List<Product>> getAll() {
 		return new ResponseEntity<>(productService.getAll(), HttpStatus.OK);
 	}
@@ -43,7 +44,7 @@ public class ProductController {
 //	get product by id lazy fetch
 	@GetMapping("/{id}")
 	public ResponseEntity<Product> getById(@PathVariable Integer id) {
-		return new ResponseEntity<>(productService.getById(id), HttpStatus.OK);
+		return new ResponseEntity<>(productService.getByIdLazyFetch(id), HttpStatus.OK);
 	}
 	
 //	get product details eager fetch using dto

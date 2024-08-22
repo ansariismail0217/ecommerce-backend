@@ -18,7 +18,7 @@ public class CategoryService {
 	private CategoryRepository categoryRepository;
 
 //	CREATE
-	public Category addCategory(Category category){
+	public Category createCategory(Category category){
 		return categoryRepository.save(category);
 	}
 
@@ -33,15 +33,11 @@ public class CategoryService {
 	public List<Category> getAllEagerFetch() {
 		return categoryRepository.findAll();
 	}
-
-	public Category getByIdEagerFetch(int id) {
-		return categoryRepository.findById(id)
-				.orElseThrow(()-> new ItemNotFoundException("No item found with the given description"));
-	}
 	
 //	Eager Fetch: Get category by id along with the products stored inside it
-	public Category getById(Integer id) {
-		return categoryRepository.findProductsByCategory(id)
+	public Category getByIdEagerFetch(Integer id) {
+		return categoryRepository.findById(id)
+//		return categoryRepository.findProductsByCategory(id)
 				.orElseThrow(()-> new ItemNotFoundException("No item found with the given description"));
 	}
 	
@@ -63,14 +59,14 @@ public class CategoryService {
 	}
 
 //	UPDATE
-	public Category updateCategoryById(int id, Category category) {
+	public Category updateById(int id, Category category) {
 		Category category2 = categoryRepository.findById(id).get();
 		category2.setName(category.getName());
 		return categoryRepository.save(category2);
 	}
 
 //	DELETE
-	public List<Category> deleteCategory(int id){
+	public List<Category> deleteById(int id){
 		categoryRepository.deleteById(id);
 		return categoryRepository.findAll();
 	}

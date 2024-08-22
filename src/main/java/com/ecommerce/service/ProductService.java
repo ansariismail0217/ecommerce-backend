@@ -28,7 +28,7 @@ public class ProductService {
 	}
 	
 //	this will fetch details lazily excluding category fields
-	public Product getById(Integer id) {
+	public Product getByIdLazyFetch(Integer id) {
 		return productRepository.findById(id)
 				.orElseThrow(()-> new ItemNotFoundException("No item found with the given description"));
 	}

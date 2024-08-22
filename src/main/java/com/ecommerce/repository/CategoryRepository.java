@@ -12,6 +12,7 @@ import com.ecommerce.model.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
+//	below query and code will return same result as findById()
 	@Query("select c from Category c left join fetch c.products where c.id =:id")
 	Optional<Category> findProductsByCategory(@Param("id") Integer id);
 	
